@@ -1,0 +1,32 @@
+name: Train and Validate Model
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  train-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Start MLflow server
+        run: |
+          mlflow server --host 0.0.0.0 --port 5000 &
+          sleep 5
+      - name: Preprocess data
+        run: python -c "from src.preprocess import preprocess_data; preprocess_data('data')"
+      - name: Train model
+        run: python -c "from src.train import train_model; train_model('data')"
+        env:
+          MLFLOW_TRACKING_URI: http://localhost:5000
+      - name: Validate model
+        run: python model_validation.py
+        env:
+          MLFLOW_TRACKING_URI: http://localhost:5000

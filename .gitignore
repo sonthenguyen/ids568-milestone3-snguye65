@@ -1,0 +1,11 @@
+venv/
+airflow_home/
+__pycache__/
+*.pyc
+.env
+mlruns/
+data/
+*.egg-info/
+.eggs/
+dist/
+build/
